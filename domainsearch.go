@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+//source: 
+//https://groups.google.com/forum/#!msg/golang-nuts/Wg_5BuaJruk/tqBXZLlCOjAJ
 func whois(dom, server string) string {
 	conn, err := net.Dial("tcp", server+":43")
 	if err != nil {
