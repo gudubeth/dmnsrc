@@ -1,7 +1,7 @@
 Domain Search Tool
 ===============================
 
-Common line tool for batch checking domain existence. It does this by adding 
+Command line tool for batch checking domain existence. It does this by adding 
 suffixes and prefixes to the word list given in words.txt. Only checks .com
 domains. 
 
@@ -22,3 +22,9 @@ Planned features
 * Default word libraries
 * Option to use more than one word list file
 * Concurrent domain check
+
+"Maybe" Features
+----------------
+* Plural names for english (maybe)
+* Create flickr style domains
+* Find similar words
