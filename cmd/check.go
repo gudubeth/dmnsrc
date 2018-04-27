@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/ozgio/dmnsrc/pkg/checker"
 	"github.com/ozgio/dmnsrc/pkg/input"
 	"github.com/spf13/cobra"
@@ -16,10 +16,14 @@ var checkCmd = &cobra.Command{
 	Short: "Check availability of domains",
 	Long: `|
 Checks the availability of domains. It needs full domain names and doesn't 
-generate any domains. For extended search see "search" command.
+generate any domains. For extended search see "search" command. 
 
-Example:
-	dmn check ozgur.io
+For multiple domain check seperate domains with comma or space
+
+Examples:
+	dmn check example.com
+	dmn check example.com example.org
+
 `,
 	Args: cobra.MinimumNArgs(1),
 	Run:  runCheckCmd,
@@ -39,17 +43,17 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 	var validSuffix = regexp.MustCompile(`\.com|\.net|\.edu$`)
 	for _, name := range allNames {
 		if !validSuffix.Match([]byte(name)) {
-			fmt.Printf("%s: currently only .com, .net, .edu domains are available for search\n", name)
+			color.Red("❗ %s: error (currently only .com, .net, .edu domains are available for search)", name)
 			continue
 		}
 		srv := checker.SelectRandomWhoisServer()
 		info, err := checker.Whois(name, srv)
 		if err != nil {
-			fmt.Printf("%s: error (%s)\n", name, err.Error())
+			color.Red("❗ %s: error (%s)", name, err.Error())
 		} else if strings.Contains(info, "No match") {
-			fmt.Printf("%s: available\n", name)
+			color.Green("✔ %s: available", name)
 		} else {
-			fmt.Printf("%s: not available\n", name)
+			color.Yellow("✘ %s: not available", name)
 		}
 	}
 }

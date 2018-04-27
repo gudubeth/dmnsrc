@@ -10,7 +10,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "dmn",
 	Short: "dmn is tool for searching domain names",
-	Long:  `Domain search tool for command line. Fo further documentation go to github.com/ozgio/dmnsrc`,
+	Long:  `Domain search tool for command line. For further documentation go to github.com/ozgio/dmnsrc`,
 }
 
 func Execute() {
