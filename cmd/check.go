@@ -56,14 +56,10 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 		if benchmark {
 			benchmarkStr = fmt.Sprintf(" (%.3f)", float32(record.Elapsed/time.Millisecond)/1000)
 		}
-		// for _, name := range allNames {
-		// 	info, err := checker.Whois(name)
 
 		if record.Error != nil {
 			color.Red("❗ %s: error (%s)%s", record.Name, record.Error.Error(), benchmarkStr)
-		} else if strings.Contains(record.Response, "No match") ||
-			strings.Contains(record.Response, "No entries") ||
-			strings.Contains(record.Response, "NOT FOUND") { //TODO revisit whois availiblty check
+		} else if record.Available {
 			color.Green("✔ %s: available%s", record.Name, benchmarkStr)
 		} else {
 			color.Yellow("✘ %s: unavailable%s", record.Name, benchmarkStr)

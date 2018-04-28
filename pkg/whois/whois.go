@@ -1,6 +1,7 @@
 package whois
 
 import (
+	"strings"
 	"sync"
 	"time"
 
@@ -38,7 +39,7 @@ func FetchMultiple(names []string, numFetchers int) <-chan Record {
 	for i := 0; i < numFetchers; i++ {
 		go func() {
 			defer wg.Done()
-			for d := range fetch(nc) {
+			for d := range parse(fetch(nc)) {
 				out <- d
 			}
 		}()
@@ -82,5 +83,24 @@ func fetch(cn <-chan string) <-chan Record {
 		}
 	}()
 
+	return out
+}
+
+func parse(recs <-chan Record) <-chan Record {
+	out := make(chan Record)
+	go func() {
+		defer close(out)
+		for r := range recs {
+			if r.Error == nil &&
+				(strings.Contains(r.Response, "No match") ||
+					strings.Contains(r.Response, "No entries") ||
+					strings.Contains(r.Response, "NOT FOUND")) {
+				r.Available = true
+			} else {
+				r.Available = false
+			}
+			out <- r
+		}
+	}()
 	return out
 }
