@@ -3,10 +3,12 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
-	"github.com/ozgio/dmnsrc/pkg/checker"
+	"github.com/ozgio/dmnsrc/pkg/dev"
 	"github.com/ozgio/dmnsrc/pkg/input"
+	"github.com/ozgio/dmnsrc/pkg/whois"
 	"github.com/spf13/cobra"
 )
 
@@ -30,36 +32,48 @@ Examples:
 }
 
 var showWhois = false
+var benchmark = false
 
 func init() {
 	rootCmd.AddCommand(checkCmd)
 	checkCmd.Flags().BoolVarP(&showWhois, "whois", "w", false, "Show whois information of domain name")
+	checkCmd.Flags().BoolVarP(&benchmark, "benchmark", "b", false, "Benchmark")
 }
 
 func runCheckCmd(cmd *cobra.Command, args []string) {
+	if benchmark {
+		defer dev.PrintElapsedTime("Running time", time.Now())
+	}
 	allNames := []string{}
 	for _, arg := range args {
 		names := input.GrabDomainNames(arg)
 		allNames = append(allNames, names...)
 	}
+	out := whois.FetchMultiple(allNames, 4)
 
-	for _, name := range allNames {
-		info, err := checker.Whois(name)
+	for record := range out {
+		benchmarkStr := ""
+		if benchmark {
+			benchmarkStr = fmt.Sprintf(" (%.3f)", float32(record.Elapsed/time.Millisecond)/1000)
+		}
+		// for _, name := range allNames {
+		// 	info, err := checker.Whois(name)
 
-		if err != nil {
-			color.Red("❗ %s: error (%s)", name, err.Error())
-		} else if strings.Contains(info, "No match") ||
-			strings.Contains(info, "No entries") ||
-			strings.Contains(info, "NOT FOUND") { //TODO revisit whois availiblty check
-			color.Green("✔ %s: available", name)
+		if record.Error != nil {
+			color.Red("❗ %s: error (%s)%s", record.Name, record.Error.Error(), benchmarkStr)
+		} else if strings.Contains(record.Response, "No match") ||
+			strings.Contains(record.Response, "No entries") ||
+			strings.Contains(record.Response, "NOT FOUND") { //TODO revisit whois availiblty check
+			color.Green("✔ %s: available%s", record.Name, benchmarkStr)
 		} else {
-			color.Yellow("✘ %s: unavailable", name)
+			color.Yellow("✘ %s: unavailable%s", record.Name, benchmarkStr)
 		}
 
-		if err == nil && showWhois {
+		if record.Error == nil && showWhois {
 			fmt.Println(strings.Repeat("=", 80))
-			fmt.Println(info)
+			fmt.Println(record.Response)
 			fmt.Println(strings.Repeat("=", 80))
 		}
 	}
+
 }
