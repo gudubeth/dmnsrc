@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"regexp"
+	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -13,12 +13,12 @@ import (
 // checkCmd represents the check command
 var checkCmd = &cobra.Command{
 	Use:   "check",
-	Short: "Check availability of domains",
+	Short: "Check the vailability of domains",
 	Long: `|
-Checks the availability of domains. It needs full domain names and doesn't 
-generate any domains. For extended search see "search" command. 
+Checks the availability of domains. It needs full domain names. If you want
+extended search with domain name generation, see the "search" command. 
 
-For multiple domain check seperate domains with comma or space
+For multiple domain checks, seperate domain names with comma or space
 
 Examples:
 	dmn check example.com
@@ -29,8 +29,11 @@ Examples:
 	Run:  runCheckCmd,
 }
 
+var showWhois = false
+
 func init() {
 	rootCmd.AddCommand(checkCmd)
+	checkCmd.Flags().BoolVarP(&showWhois, "whois", "w", false, "Show whois information of domain name")
 }
 
 func runCheckCmd(cmd *cobra.Command, args []string) {
@@ -40,20 +43,23 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 		allNames = append(allNames, names...)
 	}
 
-	var validSuffix = regexp.MustCompile(`\.com|\.net|\.edu$`)
 	for _, name := range allNames {
-		if !validSuffix.Match([]byte(name)) {
-			color.Red("❗ %s: error (currently only .com, .net, .edu domains are available for search)", name)
-			continue
-		}
-		srv := checker.SelectRandomWhoisServer()
-		info, err := checker.Whois(name, srv)
+		info, err := checker.Whois(name)
+
 		if err != nil {
 			color.Red("❗ %s: error (%s)", name, err.Error())
-		} else if strings.Contains(info, "No match") {
+		} else if strings.Contains(info, "No match") ||
+			strings.Contains(info, "No entries") ||
+			strings.Contains(info, "NOT FOUND") { //TODO revisit whois availiblty check
 			color.Green("✔ %s: available", name)
 		} else {
-			color.Yellow("✘ %s: not available", name)
+			color.Yellow("✘ %s: unavailable", name)
+		}
+
+		if err == nil && showWhois {
+			fmt.Println(strings.Repeat("=", 80))
+			fmt.Println(info)
+			fmt.Println(strings.Repeat("=", 80))
 		}
 	}
 }
