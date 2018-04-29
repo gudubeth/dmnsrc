@@ -50,7 +50,7 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 		allNames = append(allNames, names...)
 	}
 
-	out := whois.FetchMultiple(nil, allNames, 4)
+	out := whois.LookupMultiple(nil, allNames, 4)
 
 	for record := range out {
 		benchmarkStr := ""
@@ -60,7 +60,7 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 
 		if record.Error != nil {
 			color.Red("❗ %s: error (%s)%s", record.Name, record.Error.Error(), benchmarkStr)
-		} else if record.Available {
+		} else if record.Attributes.Available {
 			color.Green("✔ %s: available%s", record.Name, benchmarkStr)
 		} else {
 			color.Yellow("✘ %s: unavailable%s", record.Name, benchmarkStr)

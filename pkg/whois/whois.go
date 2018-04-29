@@ -9,11 +9,25 @@ import (
 	"github.com/domainr/whois"
 )
 
-// Fetch fetches whois record of specified domain name.
+// Record represents parsed whois record
+type Record struct {
+	Name       string
+	Response   string
+	Error      error
+	Elapsed    time.Duration
+	Attributes Attributes
+}
+
+// Attributes represents attributes of the whois record
+type Attributes struct {
+	Available bool
+	Expires   time.Time
+}
+
+// Lookup fetches whois record of specified domain name.
 //
 // It returns whois data and any error encountered.
-func Fetch(name string) (string, error) {
-
+func Lookup(name string) (string, error) {
 	request, err := whois.NewRequest(name)
 	if err != nil {
 		return "", err
@@ -26,19 +40,24 @@ func Fetch(name string) (string, error) {
 	return response.String(), err
 }
 
-// Record presents parsed whois record
-type Record struct {
-	Name      string
-	Response  string
-	Error     error
-	Elapsed   time.Duration
-	Available bool
-	Expires   time.Time
+// Parse parses whois response. this is a temporary and a very simple
+// implementation and quite possibly incorrect
+func Parse(name, text string) *Attributes {
+	attr := &Attributes{}
+	if strings.Contains(text, "No match") ||
+		strings.Contains(text, "No entries") ||
+		strings.Contains(text, "NOT FOUND") {
+		attr.Available = true
+	} else {
+		attr.Available = false
+	}
+
+	return attr
 }
 
-// FetchMultiple fetches multiple whois records and puts them to unbuffered channel, which means,
+// LookupMultiple fetches multiple whois records and puts them to unbuffered channel, which means,
 // if you don't read the channel, it will not progress
-func FetchMultiple(ctx context.Context, names []string, numFetchers int) <-chan Record {
+func LookupMultiple(ctx context.Context, names []string, numWorkers int) <-chan Record {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -48,19 +67,19 @@ func FetchMultiple(ctx context.Context, names []string, numFetchers int) <-chan 
 	//the job
 	nc := generateName(ctx, names)
 	out := make(chan Record)
-	var wg sync.WaitGroup
-	wg.Add(numFetchers)
 
-	for i := 0; i < numFetchers; i++ {
-		go func(i int) {
+	var wg sync.WaitGroup
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func() {
 			defer wg.Done()
 
-			//TODO remove pipeline, this style is not really needed here
-			for rec := range parse(fetch(nc)) {
-				out <- rec
+			for name := range nc {
+				rec := fetchForChannel(name)
+				out <- *rec
 			}
-
-		}(i)
+		}()
 	}
 
 	go func() {
@@ -89,43 +108,23 @@ func generateName(ctx context.Context, names []string) <-chan string {
 	return nc
 }
 
-// fetch fetches whois records coming from cn
-func fetch(cn <-chan string) <-chan Record {
-	out := make(chan Record)
-	go func() {
-		defer close(out)
-		for name := range cn {
-			start := time.Now()
-			repsonse, err := Fetch(name)
-			out <- Record{
-				Name:     name,
-				Response: repsonse,
-				Error:    err,
-				Elapsed:  time.Since(start),
-			}
-		}
-	}()
+// fetchForChannel lookups for whois record, parses it and prepares Record
+// object to send from channel
+func fetchForChannel(name string) *Record {
+	start := time.Now()
+	response, err := Lookup(name)
 
-	return out
-}
+	rec := &Record{
+		Name:     name,
+		Response: response,
+		Error:    err,
+		Elapsed:  time.Since(start),
+	}
 
-// parse parses whois text. this is a temporary and a very simple implementation,
-// quite possibly incorrect
-func parse(recs <-chan Record) <-chan Record {
-	out := make(chan Record)
-	go func() {
-		defer close(out)
-		for r := range recs {
-			if r.Error == nil &&
-				(strings.Contains(r.Response, "No match") ||
-					strings.Contains(r.Response, "No entries") ||
-					strings.Contains(r.Response, "NOT FOUND")) {
-				r.Available = true
-			} else {
-				r.Available = false
-			}
-			out <- r
-		}
-	}()
-	return out
+	if err == nil {
+		attr := Parse(name, response)
+		rec.Attributes = *attr
+	}
+
+	return rec
 }
