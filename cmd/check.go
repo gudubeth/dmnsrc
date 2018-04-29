@@ -49,7 +49,8 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 		names := input.GrabDomainNames(arg)
 		allNames = append(allNames, names...)
 	}
-	out := whois.FetchMultiple(allNames, 4)
+
+	out := whois.FetchMultiple(nil, allNames, 4)
 
 	for record := range out {
 		benchmarkStr := ""
