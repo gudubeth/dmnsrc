@@ -22,6 +22,8 @@ func TestGrabDomainsNames(t *testing.T) {
 		{"example.com,example.org,", []string{"example.com", "example.org"}, "parsing domains suffixed with comma"},
 		{" example.com   example.org     ", []string{"example.com", "example.org"}, "parsing domains with spaces everywhere"},
 		{" , , example.com ,  ,,,,example.org  ,,,,  ,, ", []string{"example.com", "example.org"}, "parsing domains with spaces and commas everywhere"},
+		{"\t\texample.com   \n\texample.org     ", []string{"example.com", "example.org"}, "parsing domains with tabs and new lines"},
+		{"\t\texample.com   \n\texample.org     \r\nexample.net\r\n", []string{"example.com", "example.org", "example.net"}, "parsing domains with tabs and new lines"},
 	}
 
 	for _, test := range tests {
