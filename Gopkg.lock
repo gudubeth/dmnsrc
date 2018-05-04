@@ -50,6 +50,17 @@
   version = "v0.0.3"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/ozgio/dmnsrc"
+  packages = [
+    "cmd",
+    "pkg/dev",
+    "pkg/input",
+    "pkg/whois"
+  ]
+  revision = "69b2cf1bee66f5cac6cbd1516844fd7417fd73cc"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -128,6 +139,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f5f324b5b0def005af0129f4d6f2591fb103d687a158c3f7d5e08c6488bd06a4"
+  inputs-digest = "b8ca414be358888c393bd7a0c9530e4811f6837870d840ce42db3381ff009ae3"
   solver-name = "gps-cdcl"
   solver-version = 1
