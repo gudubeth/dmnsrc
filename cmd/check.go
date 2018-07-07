@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/ozgio/dmnsrc/pkg/dev"
-	"github.com/ozgio/dmnsrc/pkg/input"
-	"github.com/ozgio/dmnsrc/pkg/whois"
+	"github.com/ozgio/dmn/pkg/dev"
+	"github.com/ozgio/dmn/pkg/input"
+	"github.com/ozgio/dmn/pkg/whois"
 	"github.com/spf13/cobra"
 )
 
