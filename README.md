@@ -8,8 +8,7 @@ Planned features
 ----------------
 Core
 * Improve domain check mechanism and add different checking ways based on a flag
-* Concurrent domain check
-* Option to get full domain names from file. Also pipelining for this feature
+* Option to get full domain names from file.
 
 Name generation
 * Set multiple suffixes and/or prefixes at once

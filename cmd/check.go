@@ -33,14 +33,13 @@ Examples:
 	dmn check example.com
 	dmn check example.com example.org
 `,
-		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			runCheckCmd(flags, args)
 		},
 	}
 
-	cmd.Flags().BoolVarP(&flags.showWhois, "whois", "w", false, "Show whois information of domain name")
-	cmd.Flags().BoolVarP(&flags.benchmark, "benchmark", "b", false, "Benchmark")
+	cmd.Flags().BoolVarP(&flags.showWhois, "whois", "w", false, "Show whois information of the domain name")
+	cmd.Flags().BoolVarP(&flags.benchmark, "benchmark", "b", false, "Show benchmark information")
 
 	return cmd
 }
@@ -54,9 +53,19 @@ func runCheckCmd(flags checkCmdFlags, args []string) {
 		defer dev.PrintElapsedTime("Running time", time.Now())
 	}
 	allNames := []string{}
-	for _, arg := range args {
-		names := input.GrabDomainNames(arg)
-		allNames = append(allNames, names...)
+	stdinStr, err := input.Stdin()
+	if err == nil && stdinStr != "" {
+		allNames = input.GrabDomainNames(stdinStr)
+	} else {
+		for _, arg := range args {
+			names := input.GrabDomainNames(arg)
+			allNames = append(allNames, names...)
+		}
+	}
+
+	if len(allNames) == 0 {
+		fmt.Println("Error: No domain name is given")
+		return
 	}
 
 	out := whois.LookupMultiple(nil, allNames, 4)
