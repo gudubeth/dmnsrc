@@ -1,6 +1,8 @@
 Domain Search Tool
 ===============================
 
+[![CircleCI](https://circleci.com/gh/ozgio/dmn.svg?style=svg)](https://circleci.com/gh/ozgio/dmn)
+
 Command line tool for checking domain name availability. 
 
 Usage:
