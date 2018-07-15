@@ -40,8 +40,9 @@ func Lookup(name string) (string, error) {
 	return response.String(), err
 }
 
-// Parse parses whois response. this is a temporary and a very simple
+// Parse parses whois response. This is a temporary and a very simple
 // implementation and quite possibly incorrect
+// TODO improve parser
 func Parse(name, text string) *Attributes {
 	attr := &Attributes{}
 	if strings.Contains(text, "No match") ||
@@ -109,7 +110,7 @@ func generateName(ctx context.Context, names []string) <-chan string {
 }
 
 // fetchForChannel lookups for whois record, parses it and prepares Record
-// object to send from channel
+// object to be sent from a channel
 func fetchForChannel(name string) *Record {
 	start := time.Now()
 	response, err := Lookup(name)

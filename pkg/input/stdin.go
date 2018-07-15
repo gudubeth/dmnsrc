@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Stdin returns piped content from the command line.
 func Stdin() (string, error) {
 	info, err := os.Stdin.Stat()
 	if err != nil {

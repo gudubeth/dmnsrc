@@ -15,6 +15,7 @@ import (
 type checkCmdFlags struct {
 	showWhois bool
 	benchmark bool
+	parallel  int
 }
 
 func NewCheckCommand() *cobra.Command {
@@ -40,6 +41,7 @@ Examples:
 
 	cmd.Flags().BoolVarP(&flags.showWhois, "whois", "w", false, "Show whois information of the domain name")
 	cmd.Flags().BoolVarP(&flags.benchmark, "benchmark", "b", false, "Show benchmark information")
+	cmd.Flags().IntVarP(&flags.parallel, "parallel", "p", 4, "Number of concurrent workers that check domains")
 
 	return cmd
 }
@@ -52,6 +54,23 @@ func runCheckCmd(flags checkCmdFlags, args []string) {
 	if flags.benchmark {
 		defer dev.PrintElapsedTime("Running time", time.Now())
 	}
+	allNames := getNames(args)
+
+	if len(allNames) == 0 {
+		fmt.Println("Error: No domain name is given")
+		return
+	}
+
+	out := whois.LookupMultiple(nil, allNames, flags.parallel)
+
+	for record := range out {
+		printRecord(record, flags.benchmark, flags.showWhois)
+
+	}
+
+}
+
+func getNames(args []string) []string {
 	allNames := []string{}
 	stdinStr, err := input.Stdin()
 	if err == nil && stdinStr != "" {
@@ -63,32 +82,26 @@ func runCheckCmd(flags checkCmdFlags, args []string) {
 		}
 	}
 
-	if len(allNames) == 0 {
-		fmt.Println("Error: No domain name is given")
-		return
+	return allNames
+}
+
+func printRecord(record whois.Record, showBenchmark bool, showWhois bool) {
+	benchmarkStr := ""
+	if showBenchmark {
+		benchmarkStr = fmt.Sprintf(" (%.3f)", float32(record.Elapsed/time.Millisecond)/1000)
 	}
 
-	out := whois.LookupMultiple(nil, allNames, 4)
-
-	for record := range out {
-		benchmarkStr := ""
-		if flags.benchmark {
-			benchmarkStr = fmt.Sprintf(" (%.3f)", float32(record.Elapsed/time.Millisecond)/1000)
-		}
-
-		if record.Error != nil {
-			color.Red("❗ %s: error (%s)%s", record.Name, record.Error.Error(), benchmarkStr)
-		} else if record.Attributes.Available {
-			color.Green("✔ %s: available%s", record.Name, benchmarkStr)
-		} else {
-			color.Yellow("✘ %s: unavailable%s", record.Name, benchmarkStr)
-		}
-
-		if record.Error == nil && flags.showWhois {
-			fmt.Println(strings.Repeat("=", 80))
-			fmt.Println(record.Response)
-			fmt.Println(strings.Repeat("=", 80))
-		}
+	if record.Error != nil {
+		color.Red("❗ %s: error (%s)%s", record.Name, record.Error.Error(), benchmarkStr)
+	} else if record.Attributes.Available {
+		color.Green("✔ %s: available%s", record.Name, benchmarkStr)
+	} else {
+		color.Yellow("✘ %s: unavailable%s", record.Name, benchmarkStr)
 	}
 
+	if record.Error == nil && showWhois {
+		fmt.Println(strings.Repeat("=", 80))
+		fmt.Println(record.Response)
+		fmt.Println(strings.Repeat("=", 80))
+	}
 }
