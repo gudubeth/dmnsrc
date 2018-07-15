@@ -11,5 +11,9 @@
   version = "1.2.1"
 
 [[constraint]]
+  name = "github.com/domainr/whois"
+  branch = "master"
+
+[[constraint]]
   name = "github.com/fatih/color"
   version = "1.6.0"

@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/PuerkitoBio/goquery"
   packages = ["."]
-  revision = "a86ea073017a6beddef78c8659e7224e8ca634b0"
-  version = "v1.4.0"
+  revision = "dc2ec5c7ca4d9aae063b79b9f581dd3ea6afd2b2"
+  version = "v1.4.1"
 
 [[projects]]
   name = "github.com/andybalholm/cascadia"
@@ -23,13 +23,13 @@
   branch = "master"
   name = "github.com/domainr/whois"
   packages = ["."]
-  revision = "5d48ef794beff9b20a0a732f69c8dc41e542e24f"
+  revision = "975c7833b02e9b09b05f41cb5650339b4e913467"
 
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
-  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
-  version = "v1.6.0"
+  revision = "5b77d2a35fb0ede96d138fc9a99f5c9b6aef11b4"
+  version = "v1.7.0"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -50,17 +50,6 @@
   version = "v0.0.3"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/ozgio/dmnsrc"
-  packages = [
-    "cmd",
-    "pkg/dev",
-    "pkg/input",
-    "pkg/whois"
-  ]
-  revision = "69b2cf1bee66f5cac6cbd1516844fd7417fd73cc"
-
-[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -75,8 +64,8 @@
 [[projects]]
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "a1f051bc3eba734da4772d60e2d677f47cf93ef4"
-  version = "v0.0.2"
+  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
+  version = "v0.0.3"
 
 [[projects]]
   name = "github.com/spf13/pflag"
@@ -87,14 +76,14 @@
 [[projects]]
   name = "github.com/stretchr/testify"
   packages = ["assert"]
-  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
-  version = "v1.2.1"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
   branch = "master"
   name = "github.com/zonedb/zonedb"
   packages = ["."]
-  revision = "fb3a6e3375648cea5f73ba765551ea978d46141c"
+  revision = "f99a1ca7e349b08337ce71d529074e29e3ecb594"
 
 [[projects]]
   branch = "master"
@@ -104,13 +93,13 @@
     "html/atom",
     "html/charset"
   ]
-  revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
+  revision = "d0887baf81f4598189d4e12a37c6da86f0bba4d0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "cbbc999da32df943dac6cd71eb3ee39e1d7838b9"
+  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -139,6 +128,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b8ca414be358888c393bd7a0c9530e4811f6837870d840ce42db3381ff009ae3"
+  inputs-digest = "70db7bb34d4d4d26839db2dca34a63f27019b6f59778ce9f91b0695ef063fa5a"
   solver-name = "gps-cdcl"
   solver-version = 1
