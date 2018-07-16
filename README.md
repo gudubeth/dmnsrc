@@ -34,14 +34,11 @@ dmn --help
     # Get dependencies
     make dep
 
-For online code documentation see [Godocs](3).
+For online code documentation see [Godocs](https://godoc.org/github.com/ozgio/dmn).
 
 TODO
 ----
 * Improve domain check mechanism and add different checking methods based on a flag
 * Add name generation support
-
-
-[3]: https://godoc.org/github.com/ozgio/dmn
 
 

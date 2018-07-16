@@ -1,3 +1,4 @@
+//Package input provides methods for parsing cli inputs
 package input
 
 import (

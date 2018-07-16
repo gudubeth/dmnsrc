@@ -1,3 +1,4 @@
+//Package dev provides functions and tools for development
 package dev
 
 import (

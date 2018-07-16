@@ -1,3 +1,4 @@
+//Package whois provides functions to lookup and parse whois records
 package whois
 
 import (
